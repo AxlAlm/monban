@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  authdb:
+    image: postgres:latest
+    container_name: monban
+    environment:
+      POSTGRES_DB: monban
+      POSTGRES_USER: monban
+      POSTGRES_PASSWORD: monban
+    ports:
+      - "5432:5432"
