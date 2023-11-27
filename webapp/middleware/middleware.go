@@ -1,15 +1,17 @@
-package handler
+package middleware
 
 import (
 	"context"
 	"fmt"
 	"monban/database"
 	"net/http"
+
+	"github.com/jackc/pgx/v5"
 )
 
-type TxHandler func(http.ResponseWriter, *http.Request) error
+type TxHandler func(http.ResponseWriter, *http.Request, pgx.Tx)
 
-func transaction(db *database.DB, handlerFunc TxHandler) http.Handler {
+func Transaction(db *database.DB, handlerFunc TxHandler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tx, err := db.Begin()
 		if err != nil {
@@ -30,6 +32,6 @@ func transaction(db *database.DB, handlerFunc TxHandler) http.Handler {
 			err = tx.Commit(context.Background())
 		}()
 
-		err = handlerFunc(w, r)
+		handlerFunc(w, r, tx)
 	})
 }

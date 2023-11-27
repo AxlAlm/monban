@@ -1,12 +1,45 @@
-version: "3"
-
+version: "3.8"
 services:
-  authdb:
+  db:
     image: postgres:latest
-    container_name: monban
+    restart: always
     environment:
       POSTGRES_DB: monban
       POSTGRES_USER: monban
       POSTGRES_PASSWORD: monban
     ports:
       - "5432:5432"
+
+  # migrate:
+  #   image: migrate/migrate
+  #   volumes:
+  #     - ./migrations:/migrations
+  #   # entrypoint: ["/bin/sh", "-c"]
+  #   # command: >
+  #   #   "while ! nc -z db 5432; do sleep 1; done;
+  #   #   migrate -path migrations -database postgres://monban:monban@db:5432/monban?sslmode=disable up"
+  #   command:
+  #     [
+  #       "-source=file://migrations",
+  #       "-database",
+  #       "postgres://monban:monban@db:5432/monban?sslmode=disable",
+  #       "up",
+  #     ]
+  #   restart: on-failure
+  #   depends_on:
+  #     - db
+
+  # schema-dump:
+  #   image: postgres:latest
+  #   environment:
+  #     PGPASSWORD: monban
+  #   volumes:
+  #     - ./schema-dump:/schema-dump
+  #   depends_on:
+  #     - migrate
+  #   command:
+  #     [
+  #       "/bin/sh",
+  #       "-c",
+  #       "until pg_isready -h db -p 5432; do sleep 4; done && pg_dump -h db -U monban -d monban -f /schema-dump/schema.sql",
+  #     ]

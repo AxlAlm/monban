@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"monban/config"
 	"monban/database"
@@ -19,6 +20,16 @@ func main() {
 		config.Config.DBMaxPoolConns,
 	)
 	defer db.Close()
-	r := webapp.SetupWebApp()
+	r := webapp.SetupWebApp(&db)
+
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println(err.Error())
+		panic("oh no")
+	}
+
+	rows, err := tx.Exec(context.Background(), "select * from api_keys")
+	fmt.Println(rows)
+
 	http.ListenAndServe(":3000", r)
 }

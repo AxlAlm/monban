@@ -17,6 +17,8 @@ func NewDB(user, password, host, name string, port, poolSize int) DB {
 		"user=%s password=%s host=%s port=%d dbname=%s pool_max_conns=%d",
 		user, password, host, port, name, poolSize,
 	)
+
+	fmt.Println(dsn)
 	connPool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		panic("Unable to connect to db")
